@@ -80,7 +80,7 @@ dependencies {
 
     // Tests
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.testcontainers:postgresql:1.20.4")
+    testImplementation("org.testcontainers:postgresql:1.21.4")
     testImplementation("org.springframework.security:spring-security-test")
 
     //Lombok
@@ -97,8 +97,8 @@ dependencies {
     runtimeOnly("com.twelvemonkeys.imageio:imageio-webp:3.12.0")
 
     //TestContainers
-    testImplementation("org.testcontainers:testcontainers:1.20.4")
-    testImplementation("org.testcontainers:junit-jupiter:1.20.4")
+    testImplementation("org.testcontainers:testcontainers:1.21.4")
+    testImplementation("org.testcontainers:junit-jupiter:1.21.4")
 }
 
 openApiGenerate {
@@ -122,8 +122,7 @@ openApiGenerate {
 
 tasks.withType<JavaCompile> {
     dependsOn(tasks.openApiGenerate)
-    // Target Java 21 bytecode so SpotBugs (ASM 9.7) can read the class files.
-    // Remove if you start using Java 22+ language features.
+    // Target Java 22 bytecode so SpotBugs (ASM 9.7) can read the class files.
     options.release.set(22)
 }
 
