@@ -25,11 +25,8 @@ import java.net.URI;
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 public abstract class BaseE2ETest {
 
-    static final GenericContainer<?> minio = new GenericContainer<>("minio/minio:latest")
-            .withEnv("MINIO_ROOT_USER", "admin")
-            .withEnv("MINIO_ROOT_PASSWORD", "password123")
-            .withExposedPorts(9000)
-            .withCommand("server /data");
+    static final GenericContainer<?> s3mock = new GenericContainer<>("adobe/s3mock:5.2.3")
+            .withExposedPorts(9090);
 
     static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16")
             .withDatabaseName("telaria")
@@ -38,7 +35,7 @@ public abstract class BaseE2ETest {
 
     static {
         postgres.start();
-        minio.start();
+        s3mock.start();
     }
 
     @DynamicPropertySource
@@ -48,17 +45,17 @@ public abstract class BaseE2ETest {
         registry.add("spring.datasource.password", postgres::getPassword);
         registry.add("spring.jpa.database-platform", () -> "org.hibernate.dialect.PostgreSQLDialect");
 
-        registry.add("minio.endpoint", () -> "http://localhost:" + minio.getMappedPort(9000));
+        registry.add("minio.endpoint", () -> "http://localhost:" + s3mock.getMappedPort(9090));
         registry.add("minio.access-key", () -> "admin");
         registry.add("minio.secret-key", () -> "password123");
         registry.add("minio.bucket", () -> "telaria-document-sharing");
-        registry.add("minio.public-endpoint", () -> "http://localhost:" + minio.getMappedPort(9000));
+        registry.add("minio.public-endpoint", () -> "http://localhost:" + s3mock.getMappedPort(9090));
     }
 
     @BeforeAll
     static void createBucket() {
         try (S3Client s3 = S3Client.builder()
-                .endpointOverride(URI.create("http://localhost:" + minio.getMappedPort(9000)))
+                .endpointOverride(URI.create("http://localhost:" + s3mock.getMappedPort(9090)))
                 .credentialsProvider(StaticCredentialsProvider.create(
                         AwsBasicCredentials.create("admin", "password123")))
                 .region(Region.US_EAST_1)

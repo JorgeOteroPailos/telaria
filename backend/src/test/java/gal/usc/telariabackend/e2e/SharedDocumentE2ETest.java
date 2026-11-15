@@ -783,7 +783,7 @@ class SharedDocumentE2ETest extends BaseE2ETest {
                 .andExpect(status().isNoContent());
 
         try (software.amazon.awssdk.services.s3.S3Client s3 = software.amazon.awssdk.services.s3.S3Client.builder()
-                .endpointOverride(URI.create("http://localhost:" + minio.getMappedPort(9000)))
+                .endpointOverride(URI.create("http://localhost:" + s3mock.getMappedPort(9090)))
                 .credentialsProvider(software.amazon.awssdk.auth.credentials.StaticCredentialsProvider.create(
                         software.amazon.awssdk.auth.credentials.AwsBasicCredentials.create("admin", "password123")))
                 .region(software.amazon.awssdk.regions.Region.US_EAST_1)
